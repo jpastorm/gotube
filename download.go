@@ -1,14 +1,16 @@
 package gotube
 
 import (
-	"errors"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
+	"path"
+	"strconv"
+	"time"
 )
 
 func createDir(path string) error {
@@ -34,34 +36,69 @@ func directoyExist(path string) error {
 	return nil
 }
 
-func DownloadFile(URL, path, fileName string) error {
-	if err := directoyExist(path); err != nil {
-		if err = createDir(path); err != nil {
+func DownloadFile(url, folder, fileName string) error {
+	if err := directoyExist(folder); err != nil {
+		if err = createDir(folder); err != nil {
 			return err
 		}
 	}
 
-	response, err := http.Get(URL)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
+	file := path.Base(url)
 
-	if response.StatusCode != 200 {
-		return errors.New("Received non 200 response code")
+	log.Printf("Downloading file %s from %s\n", file, url)
+
+	var path bytes.Buffer
+	path.WriteString(folder)
+	path.WriteString("/")
+	path.WriteString(fileName)
+
+	start := time.Now()
+
+	out, err := os.Create(path.String())
+
+	if err != nil {
+		fmt.Println(path.String())
+		panic(err)
 	}
 
-	file, err := os.Create(filepath.Join(path, fileName))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+	defer out.Close()
 
-	//Write the bytes to the fiel
-	_, err = io.Copy(file, response.Body)
+	headResp, err := http.Head(url)
+
 	if err != nil {
-		return err
+		panic(err)
 	}
+
+	defer headResp.Body.Close()
+
+	size, err := strconv.Atoi(headResp.Header.Get("Content-Length"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	done := make(chan int64)
+
+	go PrintDownloadPercent(done, path.String(), int64(size))
+
+	resp, err := http.Get(url)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	n, err := io.Copy(out, resp.Body)
+
+	if err != nil {
+		panic(err)
+	}
+
+	done <- n
+
+	elapsed := time.Since(start)
+	log.Printf("Download completed in %s", elapsed)
 
 	return nil
 }
@@ -77,4 +114,38 @@ func DownloadFileInMemory(uri string) ([]byte, error) {
 		log.Fatal(err)
 	}
 	return d, err
+}
+
+func PrintDownloadPercent(done chan int64, path string, total int64) {
+	var stop bool = false
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	for {
+		select {
+		case <-done:
+			stop = true
+		default:
+			fi, err := file.Stat()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			size := fi.Size()
+			if size == 0 {
+				size = 1
+			}
+
+			var percent = float64(size) / float64(total) * 100
+			fmt.Printf("%.0f", percent)
+			fmt.Println("%")
+		}
+
+		if stop {
+			break
+		}
+		time.Sleep(time.Second)
+	}
 }
