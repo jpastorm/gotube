@@ -2,6 +2,10 @@
   A youtube library for retrieving metadata, and obtaining direct links to video-only/audio-only/mixed versions of videos on YouTube in Go.
 </p>
 
+## Install
+```
+go get github.com/jpastorm/gotube
+```
 ## ⚡️ Quickstart
 
 ```go
