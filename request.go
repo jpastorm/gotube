@@ -33,7 +33,7 @@ func ExtractQueryParam(videoURL string) (string, error) {
 }
 
 func GetMetaData(url string) (Video, error) {
-	id, err := ExtractQueryParam("https://www.youtube.com/watch?v=AvQLyCqOyFs")
+	id, err := ExtractQueryParam(url)
 	if err != nil {
 		return Video{}, fmt.Errorf("ExtractQueryParam failed")
 	}
