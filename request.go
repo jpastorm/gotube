@@ -44,6 +44,9 @@ func GetMetaData(url string) (Video, error) {
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return Video{}, fmt.Errorf("failed parsing response body")
+	}
 	extractJSON := ExtractValue(string(bodyBytes), "ytInitialPlayerResponse = ", ";</script>")
 	var youtubeRequest Video
 	json.Unmarshal([]byte(extractJSON), &youtubeRequest)
