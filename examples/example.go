@@ -1,10 +1,3 @@
-<p align="center">
-  A youtube library for retrieving metadata, and obtaining direct links to video-only/audio-only/mixed versions of videos on YouTube in Go.
-</p>
-
-## ⚡️ Quickstart
-
-```go
 package main
 
 import (
@@ -19,4 +12,3 @@ func main() {
 	}
 	gotube.DownloadFile(yr.StreamingData.Formats[0].URL,"videos" ,yr.VideoDetails.Title+".mp4")
 }
-```

@@ -1,4 +1,4 @@
-package main
+package gotube
 
 import (
 	"encoding/json"
@@ -32,10 +32,15 @@ func ExtractQueryParam(videoURL string) (string, error) {
 	return id, nil
 }
 
-func GetMetaData(id string) Video {
+func GetMetaData(url string) (Video, error) {
+	id, err := ExtractQueryParam("https://www.youtube.com/watch?v=AvQLyCqOyFs")
+	if err != nil {
+		return Video{}, fmt.Errorf("ExtractQueryParam failed")
+	}
+
 	resp, err := http.Get(fmt.Sprintf("https://www.youtube.com/watch?v=%s", id))
 	if err != nil {
-		fmt.Println(err)
+		return Video{}, fmt.Errorf("get video failed")
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -43,5 +48,5 @@ func GetMetaData(id string) Video {
 	var youtubeRequest Video
 	json.Unmarshal([]byte(extractJSON), &youtubeRequest)
 
-	return youtubeRequest
+	return youtubeRequest,nil
 }
