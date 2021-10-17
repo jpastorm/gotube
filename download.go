@@ -2,6 +2,7 @@ package gotube
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -36,7 +38,14 @@ func directoyExist(path string) error {
 	return nil
 }
 
-func DownloadFile(url, folder, fileName string) error {
+func DownloadFile(url, folder, filename string, showProgress bool)  error {
+	if showProgress {
+		return DownloadFileProgress(url, folder, filename)
+	}
+	return DownloadFileWithoutProgress(url, folder, filename)
+}
+
+func DownloadFileProgress(url, folder, fileName string) error {
 	if err := directoyExist(folder); err != nil {
 		if err = createDir(folder); err != nil {
 			return err
@@ -57,8 +66,7 @@ func DownloadFile(url, folder, fileName string) error {
 	out, err := os.Create(path.String())
 
 	if err != nil {
-		fmt.Println(path.String())
-		panic(err)
+		return err
 	}
 
 	defer out.Close()
@@ -66,7 +74,7 @@ func DownloadFile(url, folder, fileName string) error {
 	headResp, err := http.Head(url)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer headResp.Body.Close()
@@ -74,7 +82,7 @@ func DownloadFile(url, folder, fileName string) error {
 	size, err := strconv.Atoi(headResp.Header.Get("Content-Length"))
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	done := make(chan int64)
@@ -84,7 +92,7 @@ func DownloadFile(url, folder, fileName string) error {
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -92,7 +100,7 @@ func DownloadFile(url, folder, fileName string) error {
 	n, err := io.Copy(out, resp.Body)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	done <- n
@@ -106,18 +114,18 @@ func DownloadFile(url, folder, fileName string) error {
 func DownloadFileInMemory(uri string) ([]byte, error) {
 	res, err := http.Get(uri)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer res.Body.Close()
 	d, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return d, err
 }
 
 func PrintDownloadPercent(done chan int64, path string, total int64) {
-	var stop bool = false
+	var stop = false
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -148,4 +156,35 @@ func PrintDownloadPercent(done chan int64, path string, total int64) {
 		}
 		time.Sleep(time.Second)
 	}
+}
+
+func DownloadFileWithoutProgress(URL, path, fileName string) error {
+	if err := directoyExist(path); err != nil {
+		if err = createDir(path); err != nil {
+			return err
+		}
+	}
+
+	response, err := http.Get(URL)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		return errors.New("Received non 200 response code")
+	}
+
+	file, err := os.Create(filepath.Join(path, fileName))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

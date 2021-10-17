@@ -10,5 +10,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	gotube.DownloadFile(yr.StreamingData.Formats[0].URL,"videos" ,yr.VideoDetails.Title+".mp4")
+	gotube.DownloadFile(yr.StreamingData.Formats[0].URL,"videos" ,yr.VideoDetails.Title+".mp4", true)
 }
