@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -52,18 +51,18 @@ func DownloadFileProgress(url, folder, fileName string) error {
 		}
 	}
 
-	file := path.Base(url)
+	//file := path.Base(url)
 
-	log.Printf("Downloading file %s from %s\n", file, url)
+	//log.Printf("Downloading file %s from %s\n", file, url)
 
-	var path bytes.Buffer
-	path.WriteString(folder)
-	path.WriteString("/")
-	path.WriteString(fileName)
+	var buffer bytes.Buffer
+	buffer.WriteString(folder)
+	buffer.WriteString("/")
+	buffer.WriteString(fileName)
 
 	start := time.Now()
 
-	out, err := os.Create(path.String())
+	out, err := os.Create(buffer.String())
 
 	if err != nil {
 		return err
@@ -87,7 +86,7 @@ func DownloadFileProgress(url, folder, fileName string) error {
 
 	done := make(chan int64)
 
-	go PrintDownloadPercent(done, path.String(), int64(size))
+	go PrintDownloadPercent(done, buffer.String(), int64(size))
 
 	resp, err := http.Get(url)
 
