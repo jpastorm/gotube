@@ -50,7 +50,10 @@ func GetMetaData(url string) (Video, error) {
 	}
 	extractJSON := ExtractValue(string(bodyBytes), "ytInitialPlayerResponse = ", ";</script>")
 	var youtubeRequest Video
-	json.Unmarshal([]byte(extractJSON), &youtubeRequest)
+	err = json.Unmarshal([]byte(extractJSON), &youtubeRequest)
+	if err != nil {
+		return Video{}, fmt.Errorf("failed extract json")
+	}
 
 	return youtubeRequest, nil
 }
