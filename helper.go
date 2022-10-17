@@ -8,7 +8,7 @@ func ExtractValue(source, startSource, endSource string) string {
 	var start, end int
 	if strings.Contains(source, startSource) && strings.Contains(source, endSource) {
 		start = strings.Index(source, startSource) + len(startSource)
-		end = Index(source,endSource, start)
+		end = Index(source, endSource, start)
 		return source[start:end]
 	} else {
 		return " "

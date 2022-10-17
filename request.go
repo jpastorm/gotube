@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 )
 
 func ExtractQueryParam(videoURL string) (string, error) {
@@ -49,7 +50,26 @@ func GetMetaData(url string) (Video, error) {
 	}
 	extractJSON := ExtractValue(string(bodyBytes), "ytInitialPlayerResponse = ", ";</script>")
 	var youtubeRequest Video
-	json.Unmarshal([]byte(extractJSON), &youtubeRequest)
+	err = json.Unmarshal([]byte(extractJSON), &youtubeRequest)
+	if err != nil {
+		return Video{}, fmt.Errorf("failed extract json")
+	}
 
-	return youtubeRequest,nil
+	return youtubeRequest, nil
+}
+
+func GetDownloadSize(url string) (int64, error) {
+	resp, err := http.Head(url)
+	if err != nil {
+		return 0, err
+	}
+
+	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
+	if err != nil {
+		return 0, err
+	}
+
+	downloadSize := int64(size)
+
+	return downloadSize, nil
 }
