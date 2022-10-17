@@ -1,5 +1,6 @@
 package gotube
 
+// Video represents the json obtained from youtube
 type Video struct {
 	ResponseContext struct {
 		ServiceTrackingParams []struct {

@@ -10,6 +10,7 @@ import (
 	"strconv"
 )
 
+// ExtractQueryParam Extract the id from a youtube url
 func ExtractQueryParam(videoURL string) (string, error) {
 	var id string
 	var err error
@@ -33,6 +34,7 @@ func ExtractQueryParam(videoURL string) (string, error) {
 	return id, nil
 }
 
+// GetMetaData Get all the data of a youtube video and return it in json format
 func GetMetaData(url string) (Video, error) {
 	id, err := ExtractQueryParam(url)
 	if err != nil {
@@ -48,7 +50,7 @@ func GetMetaData(url string) (Video, error) {
 	if err != nil {
 		return Video{}, fmt.Errorf("failed parsing response body")
 	}
-	extractJSON := ExtractValue(string(bodyBytes), "ytInitialPlayerResponse = ", ";</script>")
+	extractJSON := extractValue(string(bodyBytes), "ytInitialPlayerResponse = ", ";</script>")
 	var youtubeRequest Video
 	err = json.Unmarshal([]byte(extractJSON), &youtubeRequest)
 	if err != nil {
@@ -58,6 +60,7 @@ func GetMetaData(url string) (Video, error) {
 	return youtubeRequest, nil
 }
 
+// GetDownloadSize returns the size of a download
 func GetDownloadSize(url string) (int64, error) {
 	resp, err := http.Head(url)
 	if err != nil {
