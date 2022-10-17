@@ -1,7 +1,6 @@
 package gotube
 
 import (
-	"github.com/cavaliergopher/grab/v3"
 	"time"
 )
 
