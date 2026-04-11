@@ -616,63 +616,6 @@ type Video struct {
 					IsSubscribe    bool   `json:"isSubscribe"`
 					ID             string `json:"id"`
 				} `json:"endscreenElementRenderer,omitempty"`
-				EndscreenElementRendererTwo struct {
-					Style string `json:"style"`
-					Image struct {
-						Thumbnails []struct {
-							URL    string `json:"url"`
-							Width  int    `json:"width"`
-							Height int    `json:"height"`
-						} `json:"thumbnails"`
-					} `json:"image"`
-					VideoDuration struct {
-						Accessibility struct {
-							AccessibilityData struct {
-								Label string `json:"label"`
-							} `json:"accessibilityData"`
-						} `json:"accessibility"`
-						SimpleText string `json:"simpleText"`
-					} `json:"videoDuration"`
-					Left        float64 `json:"left"`
-					Width       float64 `json:"width"`
-					Top         float64 `json:"top"`
-					AspectRatio float64 `json:"aspectRatio"`
-					StartMs     string  `json:"startMs"`
-					EndMs       string  `json:"endMs"`
-					Title       struct {
-						Accessibility struct {
-							AccessibilityData struct {
-								Label string `json:"label"`
-							} `json:"accessibilityData"`
-						} `json:"accessibility"`
-						SimpleText string `json:"simpleText"`
-					} `json:"title"`
-					Metadata struct {
-						SimpleText string `json:"simpleText"`
-					} `json:"metadata"`
-					Endpoint struct {
-						ClickTrackingParams string `json:"clickTrackingParams"`
-						CommandMetadata     struct {
-							WebCommandMetadata struct {
-								URL         string `json:"url"`
-								WebPageType string `json:"webPageType"`
-								RootVe      int    `json:"rootVe"`
-							} `json:"webCommandMetadata"`
-						} `json:"commandMetadata"`
-						WatchEndpoint struct {
-							VideoID                            string `json:"videoId"`
-							WatchEndpointSupportedOnesieConfig struct {
-								HTML5PlaybackOnesieConfig struct {
-									CommonConfig struct {
-										URL string `json:"url"`
-									} `json:"commonConfig"`
-								} `json:"html5PlaybackOnesieConfig"`
-							} `json:"watchEndpointSupportedOnesieConfig"`
-						} `json:"watchEndpoint"`
-					} `json:"endpoint"`
-					TrackingParams string `json:"trackingParams"`
-					ID             string `json:"id"`
-				} `json:"endscreenElementRenderer,omitempty"`
 			} `json:"elements"`
 			StartMs        string `json:"startMs"`
 			TrackingParams string `json:"trackingParams"`

@@ -3,7 +3,7 @@ package gotube
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -46,7 +46,7 @@ func GetMetaData(url string) (Video, error) {
 		return Video{}, fmt.Errorf("get video failed")
 	}
 	defer resp.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Video{}, fmt.Errorf("failed parsing response body")
 	}
